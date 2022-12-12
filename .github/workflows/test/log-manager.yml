@@ -1,0 +1,30 @@
+name: Publish log-manager Docker Image
+
+on: [push, pull_request]
+
+jobs:
+  push_to_registry:
+    name: Push Docker Image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push log-manager-cleaner to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src/log-manager
+          file: ./src/log-manager/build/log-manager-cleaner.k8s.dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/log-manager-cleaner:test
+      - name: Push log-manager-nginx to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src/log-manager
+          file: ./src/log-manager/build/log-manager-nginx.k8s.dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/log-manager-nginx:test
