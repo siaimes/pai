@@ -1,0 +1,28 @@
+name: Publish webportal Docker Image
+
+on: [push]
+
+jobs:
+  push_to_registry:
+    name: Push Docker Image to Docker Hub
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+      - name: Run build-pre.sh
+        working-directory: ./src/webportal/build
+        run: |
+          chmod +x ./build-pre.sh
+          ./build-pre.sh
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v1
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_PASSWORD }}
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v2
+        with:
+          context: ./src/webportal
+          file: ./src/webportal/build/webportal.common.dockerfile
+          push: true
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/webportal:test
