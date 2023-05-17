@@ -25,13 +25,13 @@ def get_logger(name):
 
 
 def load_yaml_config(config_path):
-    with open(config_path, "r") as file:
+    with open(config_path, "r", encoding="utf8") as file:
         config_data = yaml.load(file, yaml.SafeLoader)
     return config_data
 
 
 def read_template(template_path):
-    with open(template_path, "r") as file:
+    with open(template_path, "r", encoding="utf8") as file:
         template_data = file.read()
     return template_data
 
@@ -44,7 +44,7 @@ def generate_from_template_dict(template_data, map_table):
 
 
 def write_generated_file(file_path, content_data):
-    with open(file_path, "w+") as fout:
+    with open(file_path, "w+", encoding="utf8") as fout:
         fout.write(content_data)
 
 

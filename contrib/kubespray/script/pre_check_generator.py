@@ -62,7 +62,7 @@ def main():
 
     generate_template_file(
         "quick-start/pre-check.yml.template",
-        "{0}/pre-check.yml".format(output_path),
+        f"{output_path}/pre-check.yml",
         map_table
     )
 

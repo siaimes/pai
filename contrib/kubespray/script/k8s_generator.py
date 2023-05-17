@@ -58,12 +58,12 @@ def main():
     }
     generate_template_file(
         "quick-start/hosts.yml.template",
-        "{0}/hosts.yml".format(output_path),
+        f"{output_path}/hosts.yml",
         map_table
     )
     generate_template_file(
         "quick-start/openpai.yml.template",
-        "{0}/openpai.yml".format(output_path),
+        f"{output_path}/openpai.yml",
         map_table
     )
 

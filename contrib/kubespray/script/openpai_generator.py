@@ -28,7 +28,7 @@ def get_kubernetes_node_info_from_API():
     # https://github.com/kubernetes-client/python/blob/master/kubernetes/docs/CoreV1Api.md#list_node
     pretty = 'true'
     timeout_seconds = 56
-    ret = dict()
+    ret = {}
     try:
         api_response = api_instance.list_node(pretty=pretty, timeout_seconds=timeout_seconds)
         for node in api_response.items:
@@ -62,7 +62,7 @@ def get_kubernetes_pod_info_from_API():
 
     timeout_seconds = 56
 
-    ret = dict()
+    ret = {}
     try:
         api_response = api_instance.list_pod_for_all_namespaces(timeout_seconds=timeout_seconds)
         for pod in api_response.items:
@@ -104,11 +104,11 @@ def get_pai_daemon_resource_request(cfg):
     # {%- if cluster_cfg['cluster']['common']['qos-switch'] == "true" %}
     start_match = r"{%-?\s*if\s*cluster_cfg\['cluster'\]\['common'\]\['qos-switch'\][^}]+%}"
     end_match = r"{%-?\s*endif\s*%}"  # {%- end %}
-    str_match = "{}(.*?){}".format(start_match, end_match)
+    str_match = f"{start_match}(.*?){end_match}"
     regex = re.compile(str_match, flags=re.DOTALL)
 
     for pai_daemon in pai_daemon_services:
-        deploy_template_path = os.path.join(pai_source_path, "{0}/deploy/{0}.yaml.template".format(pai_daemon))
+        deploy_template_path = os.path.join(pai_source_path, f"{pai_daemon}/deploy/{pai_daemon}.yaml.template")
         if os.path.exists(deploy_template_path):
             template = read_template(deploy_template_path)
             match = regex.search(template)
@@ -216,7 +216,7 @@ def get_hived_config(layout, cluster_config):
     node_resource_dict = get_node_resources()
     pai_daemon_resource_dict = get_pai_daemon_resource_request(cluster_config)
 
-    for sku_name in skus:
+    for sku_name in skus.keys():
         sku_mem_free, sku_cpu_free = get_min_free_resource(skus[sku_name]['workers'], node_resource_dict, pai_daemon_resource_dict)
         sku_spec = layout['machine-sku'][sku_name]
         # check if the machine has GPUs
@@ -272,7 +272,7 @@ def main():
 
     generate_template_file(
         os.path.abspath(os.path.join(os.path.abspath(__file__), '../../quick-start/services-configuration.yaml.template')),
-        "{0}/services-configuration.yaml".format(output_path),
+        f"{output_path}/services-configuration.yaml",
         map_table
     )
 
