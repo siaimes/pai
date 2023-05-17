@@ -216,7 +216,7 @@ def get_hived_config(layout, cluster_config):
     node_resource_dict = get_node_resources()
     pai_daemon_resource_dict = get_pai_daemon_resource_request(cluster_config)
 
-    for sku_name in skus.keys():
+    for sku_name in skus:
         sku_mem_free, sku_cpu_free = get_min_free_resource(skus[sku_name]['workers'], node_resource_dict, pai_daemon_resource_dict)
         sku_spec = layout['machine-sku'][sku_name]
         # check if the machine has GPUs
