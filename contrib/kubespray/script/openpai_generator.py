@@ -216,19 +216,19 @@ def get_hived_config(layout, cluster_config):
     node_resource_dict = get_node_resources()
     pai_daemon_resource_dict = get_pai_daemon_resource_request(cluster_config)
 
-    for sku_name in skus:
-        sku_mem_free, sku_cpu_free = get_min_free_resource(skus[sku_name]['workers'], node_resource_dict, pai_daemon_resource_dict)
+    for sku_name, sku_value in skus.items():
+        sku_mem_free, sku_cpu_free = get_min_free_resource(sku_value['workers'], node_resource_dict, pai_daemon_resource_dict)
         sku_spec = layout['machine-sku'][sku_name]
         # check if the machine has GPUs
         if 'computing-device' in sku_spec:
-            skus[sku_name]['gpu'] = True
-            skus[sku_name]['gpuCount'] = sku_spec['computing-device']['count']
-            skus[sku_name]['memory'] = int(sku_mem_free / sku_spec['computing-device']['count'])
-            skus[sku_name]['cpu'] = int(sku_cpu_free / sku_spec['computing-device']['count'])
+            sku_value['gpu'] = True
+            sku_value['gpuCount'] = sku_spec['computing-device']['count']
+            sku_value['memory'] = int(sku_mem_free / sku_spec['computing-device']['count'])
+            sku_value['cpu'] = int(sku_cpu_free / sku_spec['computing-device']['count'])
         else:
-            skus[sku_name]['gpu'] = False
-            skus[sku_name]['memory'] = int(sku_mem_free / sku_cpu_free)
-            skus[sku_name]['cpu'] = int(sku_cpu_free)
+            sku_value['gpu'] = False
+            sku_value['memory'] = int(sku_mem_free / sku_cpu_free)
+            sku_value['cpu'] = int(sku_cpu_free)
 
     return { "skus": skus }
 
