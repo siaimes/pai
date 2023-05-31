@@ -27,10 +27,13 @@ cp {{ cluster_cfg["pylon"]["ssl"]["crt_path"] }} certs/tls.crt
 cp {{ cluster_cfg["pylon"]["ssl"]["key_path"] }} certs/tls.key
 {% endif %}
 
-kubectl create secret generic kubernetes-dashboard-certs-openpai --from-file=certs \
-  --dry-run -n kube-system -o yaml | kubectl apply --overwrite=true -f - || exit $?
+kubectl create secret generic kubernetes-dashboard-certs --from-file=certs \
+  --dry-run=client -n kube-system -o yaml \
+  | kubectl label --dry-run=client --local k8s-app=kubernetes-dashboard -o yaml -f - \
+  | kubectl apply --overwrite=true -f - || exit $?
 
 kubectl apply --overwrite=true -f rbac.yaml || exit $?
+kubectl apply --overwrite=true -f k8s-dashboard-metrics-scraper.yaml || exit $?
 kubectl apply --overwrite=true -f k8s-dashboard.yaml || exit $?
 {% endif %}
 

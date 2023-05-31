@@ -23,6 +23,7 @@ prerequisite:
   - docker-cache
 
 template-list:
+  - k8s-dashboard-metrics-scraper.yaml
   - k8s-dashboard.yaml
   - start.sh
   - stop.sh

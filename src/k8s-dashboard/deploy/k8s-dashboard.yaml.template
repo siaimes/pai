@@ -18,26 +18,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kubernetes-dashboard-openpai
+  name: kubernetes-dashboard
   namespace: kube-system
   labels:
-    k8s-app: kubernetes-dashboard-openpai
+    k8s-app: kubernetes-dashboard
 spec:
   replicas: 1
+  revisionHistoryLimit: 10
   selector:
     matchLabels:
-      k8s-app: kubernetes-dashboard-openpai
+      k8s-app: kubernetes-dashboard
   template:
     metadata:
       labels:
-        k8s-app: kubernetes-dashboard-openpai
+        k8s-app: kubernetes-dashboard
     spec:
       hostNetwork: true
       nodeSelector:
         kubernetes.io/hostname: {{ cluster_cfg['k8s-dashboard']['dashboard-host'] }}
       containers:
-      - name: kubernetes-dashboard-openpai
-        image: {{ cluster_cfg["cluster"]["docker-registry"]["prefix"] }}kubernetes-dashboard-amd64:{{ cluster_cfg["cluster"]["docker-registry"]["tag"] }}
+      - name: kubernetes-dashboard
+        image: kubernetesui/dashboard:v2.0.0-rc3
         args:
           - --auto-generate-certificates
           - --port={{ cluster_cfg['k8s-dashboard']['dashboard-port'] }}
@@ -45,8 +46,10 @@ spec:
           - --tls-key-file=/tls.key
           - --token-ttl=604800 # 7d
         volumeMounts:
-          - name: kubernetes-dashboard-certs-openpai
+          - name: kubernetes-dashboard-certs
             mountPath: /certs
+          - mountPath: /tmp
+            name: tmp-volume
         {%- if cluster_cfg['cluster']['common']['qos-switch'] == "true" %}
         resources:
           # the ideal cpu setting will be 3.5, according to our experiment. If the server hosting k8s dashboard has enough resource, user can change this setting to a larger value.
@@ -63,6 +66,11 @@ spec:
             port: {{ cluster_cfg['k8s-dashboard']['dashboard-port'] }}
           initialDelaySeconds: 30
           timeoutSeconds: 30
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 1001
+          runAsGroup: 2001
       imagePullSecrets:
       - name: {{ cluster_cfg["cluster"]["docker-registry"]["secret-name"] }}
       tolerations:
@@ -71,7 +79,9 @@ spec:
       - key: node-role.kubernetes.io/master
         effect: NoSchedule
       volumes:
-        - name: kubernetes-dashboard-certs-openpai
+        - name: kubernetes-dashboard-certs
           secret:
-            secretName: kubernetes-dashboard-certs-openpai
-      serviceAccountName: kubernetes-dashboard-openpai
+            secretName: kubernetes-dashboard-certs
+        - name: tmp-volume
+          emptyDir: {}
+      serviceAccountName: kubernetes-dashboard

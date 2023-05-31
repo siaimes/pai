@@ -22,25 +22,48 @@ pushd $(dirname "$0") > /dev/null
 
 {% if cluster_cfg['cluster']['common']['k8s-rbac'] != 'false' %}
 
-if kubectl get deployment -n kube-system | grep -q "kubernetes-dashboard-openpai"; then
-    kubectl delete deployment kubernetes-dashboard-openpai -n kube-system || exit $?
+if kubectl get deployment -n kube-system | grep -q "kubernetes-dashboard-metrics-scraper"; then
+    kubectl delete deployment kubernetes-dashboard-metrics-scraper -n kube-system || exit $?
 fi
 
-if kubectl get roleBinding -n kube-system | grep -q "kubernetes-dashboard-minimal-openpai"; then
-    kubectl delete roleBinding kubernetes-dashboard-minimal-openpai -n kube-system || exit $?
+if kubectl get deployment -n kube-system | grep -q "kubernetes-dashboard"; then
+    kubectl delete deployment kubernetes-dashboard -n kube-system || exit $?
 fi
 
-
-if kubectl get serviceAccount -n kube-system | grep -q "kubernetes-dashboard-openpai"; then
-    kubectl delete serviceAccount kubernetes-dashboard-openpai -n kube-system || exit $?
+if kubectl get serviceAccount -n kube-system | grep -q "kubernetes-dashboard"; then
+    kubectl delete serviceAccount kubernetes-dashboard -n kube-system || exit $?
 fi
 
-if kubectl get role -n kube-system | grep -q "kubernetes-dashboard-minimal-openpai"; then
-    kubectl delete role kubernetes-dashboard-minimal-openpai -n kube-system || exit $?
+if kubectl get secret -n kube-system | grep -q "kubernetes-dashboard-csrf"; then
+    kubectl delete secret kubernetes-dashboard-csrf -n kube-system || exit $?
 fi
 
-if kubectl get secret -n kube-system | grep -q "kubernetes-dashboard-certs-openpai"; then
-    kubectl delete secret kubernetes-dashboard-certs-openpai -n kube-system || exit $?
+if kubectl get secret -n kube-system | grep -q "kubernetes-dashboard-key-holder"; then
+    kubectl delete secret kubernetes-dashboard-key-holder -n kube-system || exit $?
+fi
+
+if kubectl get configMap -n kube-system | grep -q "kubernetes-dashboard-settings"; then
+    kubectl delete configMap kubernetes-dashboard-settings -n kube-system || exit $?
+fi
+
+if kubectl get role -n kube-system | grep -q "kubernetes-dashboard"; then
+    kubectl delete role kubernetes-dashboard -n kube-system || exit $?
+fi
+
+if kubectl get clusterRole | grep -q "kubernetes-dashboard"; then
+    kubectl delete clusterRole kubernetes-dashboard || exit $?
+fi
+
+if kubectl get roleBinding -n kube-system | grep -q "kubernetes-dashboard"; then
+    kubectl delete roleBinding kubernetes-dashboard -n kube-system || exit $?
+fi
+
+if kubectl get clusterRoleBinding | grep -q "kubernetes-dashboard"; then
+    kubectl delete clusterRoleBinding kubernetes-dashboard || exit $?
+fi
+
+if kubectl get secret -n kube-system | grep -q "kubernetes-dashboard-certs"; then
+    kubectl delete secret kubernetes-dashboard-certs -n kube-system || exit $?
 fi
 
 {% endif %}
