@@ -214,7 +214,7 @@ def get_interfaces():
     return result
 
 
-def get_ip_can_access_internet(target="hub.docker.com"):
+def get_ip_can_access_internet(target="baidu.com"):
     """ return None on error """
     s = socket.socket(
             socket.AF_INET, socket.SOCK_STREAM)
