@@ -100,94 +100,69 @@ All lines will be concatenated by "&&". So do not use characters like "#", "\\" 
 
 export const DOCKER_OPTIONS = [
   {
+    key: 'pytorch-2.0.1-cuda11.7-cudnn8-devel',
+    text: 'pytorch-2.0.1-cuda11.7-cudnn8-devel',
+    image: 'siaimes/pytorch:2.0.1-cuda11.7-cudnn8-devel',
+  },
+  {
+    key: 'pytorch-1.13.1-cuda11.6-cudnn8-devel',
+    text: 'pytorch-1.13.1-cuda11.6-cudnn8-devel',
+    image: 'siaimes/pytorch:1.13.1-cuda11.6-cudnn8-devel',
+  },
+  {
     key: 'pytorch-1.12.1-cuda11.3-cudnn8-devel',
     text: 'pytorch-1.12.1-cuda11.3-cudnn8-devel',
-    image: 'pytorch/pytorch:1.12.1-cuda11.3-cudnn8-devel',
+    image: 'siaimes/pytorch:1.12.1-cuda11.3-cudnn8-devel',
   },
   {
     key: 'pytorch-1.11.0-cuda11.3-cudnn8-devel',
     text: 'pytorch-1.11.0-cuda11.3-cudnn8-devel',
-    image: 'pytorch/pytorch:1.11.0-cuda11.3-cudnn8-devel',
+    image: 'siaimes/pytorch:1.11.0-cuda11.3-cudnn8-devel',
   },
   {
     key: 'pytorch-1.10.0-cuda11.3-cudnn8-devel',
     text: 'pytorch-1.10.0-cuda11.3-cudnn8-devel',
-    image: 'pytorch/pytorch:1.10.0-cuda11.3-cudnn8-devel',
+    image: 'siaimes/pytorch:1.10.0-cuda11.3-cudnn8-devel',
   },
   {
     key: 'pytorch-1.9.1-cuda11.1-cudnn8-devel',
     text: 'pytorch-1.9.1-cuda11.1-cudnn8-devel',
-    image: 'pytorch/pytorch:1.9.1-cuda11.1-cudnn8-devel',
+    image: 'siaimes/pytorch:1.9.1-cuda11.1-cudnn8-devel',
   },
   {
     key: 'pytorch-1.8.1-cuda11.1-cudnn8-devel',
     text: 'pytorch-1.8.1-cuda11.1-cudnn8-devel',
-    image: 'pytorch/pytorch:1.8.1-cuda11.1-cudnn8-devel',
+    image: 'siaimes/pytorch:1.8.1-cuda11.1-cudnn8-devel',
   },
   {
     key: 'pytorch-1.7.1-cuda11.0-cudnn8-devel',
     text: 'pytorch-1.7.1-cuda11.0-cudnn8-devel',
-    image: 'pytorch/pytorch:1.7.1-cuda11.0-cudnn8-devel',
+    image: 'siaimes/pytorch:1.7.1-cuda11.0-cudnn8-devel',
   },
   {
     key: 'pytorch-1.6.0-cuda10.1-cudnn7-devel',
     text: 'pytorch-1.6.0-cuda10.1-cudnn7-devel',
-    image: 'pytorch/pytorch:1.6.0-cuda10.1-cudnn7-devel',
+    image: 'siaimes/pytorch:1.6.0-cuda10.1-cudnn7-devel',
   },
   {
     key: 'pytorch-1.5.1-cuda10.1-cudnn7-devel',
     text: 'pytorch-1.5.1-cuda10.1-cudnn7-devel',
-    image: 'pytorch/pytorch:1.5.1-cuda10.1-cudnn7-devel',
+    image: 'siaimes/pytorch:1.5.1-cuda10.1-cudnn7-devel',
   },
   {
-    key: 'python_3.6-pytorch_1.4.0-gpu',
-    text: 'PyTorch 1.4.0 + Python 3.6 with GPU, CUDA 10.1',
-    image: 'openpai/standard:python_3.6-pytorch_1.4.0-gpu',
+    key: 'pytorch-1.4-cuda10.1-cudnn7-devel',
+    text: 'pytorch-1.4-cuda10.1-cudnn7-devel',
+    image: 'siaimes/pytorch:1.4-cuda10.1-cudnn7-devel',
   },
   {
-    key: 'python_3.6-pytorch_1.2.0-gpu',
-    text: 'PyTorch 1.2.0 + Python 3.6 with GPU, CUDA 10.0',
-    image: 'openpai/standard:python_3.6-pytorch_1.2.0-gpu',
+    key: 'pytorch-1.3-cuda10.1-cudnn7-devel',
+    text: 'pytorch-1.3-cuda10.1-cudnn7-devel',
+    image: 'siaimes/pytorch:1.3-cuda10.1-cudnn7-devel',
   },
   {
-    key: 'python_3.6-tensorflow_2.1.0-gpu',
-    text: 'TensorFlow 2.1.0 + Python 3.6 with GPU, CUDA 10.1',
-    image: 'openpai/standard:python_3.6-tensorflow_2.1.0-gpu',
-  },
-  {
-    key: 'python_3.6-tensorflow_1.15.0-gpu',
-    text: 'TensorFlow 1.15.0 + Python 3.6 with GPU, CUDA 10.0',
-    image: 'openpai/standard:python_3.6-tensorflow_1.15.0-gpu',
-  },
-  {
-    key: 'python_3.6-mxnet_1.5.1-gpu',
-    text: 'MXNet 1.5.1 + Python 3.6 with GPU, CUDA 10.1',
-    image: 'openpai/standard:python_3.6-mxnet_1.5.1-gpu',
-  },
-  {
-    key: 'python_3.6-cntk_2.7-gpu',
-    text: 'CNTK 2.7 + Python 3.6 with GPU, CUDA 10.1',
-    image: 'openpai/standard:python_3.6-cntk_2.7-gpu',
-  },
-  {
-    key: 'python_3.6-pytorch_1.4.0-cpu',
-    text: 'PyTorch 1.4.0 + Python 3.6 with CPU',
-    image: 'openpai/standard:python_3.6-pytorch_1.4.0-cpu',
-  },
-  {
-    key: 'python_3.6-pytorch_1.2.0-cpu',
-    text: 'PyTorch 1.2.0 + Python 3.6 with CPU',
-    image: 'openpai/standard:python_3.6-pytorch_1.2.0-cpu',
-  },
-  {
-    key: 'python_3.6-tensorflow_2.1.0-cpu',
-    text: 'TensorFlow 2.1.0 + Python 3.6 with CPU',
-    image: 'openpai/standard:python_3.6-tensorflow_2.1.0-cpu',
-  },
-  {
-    key: 'python_3.6-tensorflow_1.15.0-cpu',
-    text: 'TensorFlow 1.15.0 + Python 3.6 with CPU',
-    image: 'openpai/standard:python_3.6-tensorflow_1.15.0-cpu',
+    key: 'pytorch-1.2-cuda10.0-cudnn7-devel',
+    text: 'pytorch-1.2-cuda10.0-cudnn7-devel',
+    image: 'siaimes/pytorch:1.2-cuda10.0-cudnn7-devel',
   },
 ];
 
