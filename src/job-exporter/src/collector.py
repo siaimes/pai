@@ -581,10 +581,6 @@ class ContainerCollector(Collector):
         self.gpu_info_ref = gpu_info_ref
         self.stats_info_ref = stats_info_ref
 
-        self.network_interface = network.try_to_get_right_interface(interface)
-        logger.info("found %s as potential network interface to listen network traffic",
-                self.network_interface)
-
         self.gpu_vendor = utils.get_gpu_vendor()
 
         # k8s will prepend "k8s_" to pod name. There will also be a container name
@@ -593,9 +589,6 @@ class ContainerCollector(Collector):
         # with "k8s_POD" consume nothing.
 
     def collect_impl(self):
-        all_conns = network.iftop(self.network_interface,
-                ContainerCollector.iftop_histogram,
-                ContainerCollector.iftop_timeout)
 
         stats_obj = docker_stats.stats(ContainerCollector.stats_histogram,
                 ContainerCollector.stats_timeout)
@@ -604,11 +597,10 @@ class ContainerCollector(Collector):
         gpu_infos = self.gpu_info_ref.get(now)
         self.stats_info_ref.set(stats_obj, now)
 
-        logger.debug("all_conns is %s", all_conns)
         logger.debug("gpu_info is %s", gpu_infos)
         logger.debug("stats_obj is %s", stats_obj)
 
-        return self.collect_container_metrics(stats_obj, gpu_infos, all_conns)
+        return self.collect_container_metrics(stats_obj, gpu_infos)
 
     @staticmethod
     def parse_from_labels(inspect_info, gpu_infos):
@@ -663,7 +655,7 @@ class ContainerCollector(Collector):
 
         return None
 
-    def process_one_container(self, container_id, stats, gpu_infos, all_conns, gauges):
+    def process_one_container(self, container_id, stats, gpu_infos, gauges):
         container_name = utils.walk_json_field_safe(stats, "name")
         pai_service_name = ContainerCollector.infer_service_name(container_name)
 
@@ -671,7 +663,6 @@ class ContainerCollector(Collector):
                 ContainerCollector.inspect_histogram,
                 ContainerCollector.inspect_timeout, self.gpu_vendor)
 
-        pid = inspect_info.pid
         job_name = inspect_info.job_name
 
         logger.debug("%s has inspect result %s, service_name %s",
@@ -681,22 +672,13 @@ class ContainerCollector(Collector):
             logger.debug("%s is ignored", container_name)
             return # other container, maybe kubelet or api-server
 
-        # get network consumption, since all our services/jobs running in host
-        # network, and network statistic from docker is not specific to that
-        # container. We have to get network statistic by ourselves.
-        lsof_result = network.lsof(pid,
-                ContainerCollector.lsof_histogram,
-                ContainerCollector.lsof_timeout)
-
-        net_in, net_out = network.get_container_network_metrics(all_conns,
-                lsof_result)
-        if logger.isEnabledFor(logging.DEBUG):
-            debug_info = utils.exec_cmd(
-                    "ps -o cmd fp {0} | tail -n 1".format(pid),
-                    shell=True)
-
-            logger.debug("pid %s with cmd `%s` has lsof result %s, in %d, out %d",
-                    pid, debug_info.strip(), lsof_result, net_in, net_out)
+        # I have found that there could be multiple instances of the `lsof` command running simultaneously
+        # within the `job-exporter` container for unknown reasons. During these occurrences, the nfs-kernel-server
+        # or even the server itself may become unresponsive, leading to IOError/OSError for user tasks.
+        # Given this situation, our strategy is to remove the network data collector. Once we resolve this issue,
+        # we can then concentrate on finding an alternative approach for network collection.
+        # Temporarily fix https://github.com/microsoft/pai/issues/5730 maybe.
+        net_in, net_out = 0, 0
 
         if pai_service_name is None:
             gpu_ids, container_labels = ContainerCollector.parse_from_labels(inspect_info, gpu_infos)
@@ -734,7 +716,7 @@ class ContainerCollector(Collector):
             gauges.add_value("service_block_in_byte", labels, stats["BlockIO"]["in"])
             gauges.add_value("service_block_out_byte", labels, stats["BlockIO"]["out"])
 
-    def collect_container_metrics(self, stats_obj, gpu_infos, all_conns):
+    def collect_container_metrics(self, stats_obj, gpu_infos):
         if stats_obj is None:
             logger.warning("docker stats returns None")
             return None
@@ -743,7 +725,7 @@ class ContainerCollector(Collector):
 
         for container_id, stats in stats_obj.items():
             try:
-                self.process_one_container(container_id, stats, gpu_infos, all_conns, gauges)
+                self.process_one_container(container_id, stats, gpu_infos, gauges)
             except Exception:
                 logger.exception("error when trying to process container %s with name %s",
                         container_id, utils.walk_json_field_safe(stats, "name"))
