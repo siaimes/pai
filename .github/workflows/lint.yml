@@ -1,14 +1,14 @@
 name: Lint
 
 on:
+  release:
+    types: [published]
   push:
     branches:
-    - master
-    - pai-**
+      - "**"
   pull_request:
     branches:
-    - master
-    - pai-**
+      - "**"
 
 jobs:
   docs:
@@ -17,7 +17,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
     - name: Use Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -37,7 +37,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
     - name: Install dependencies
       run: |
         curl -L https://git.io/misspell | sudo bash -s -- -b /bin
@@ -52,7 +52,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
     - name: Use Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -73,7 +73,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v1
+      uses: actions/checkout@v3
     - name: Use Python 3.8
       uses: actions/setup-python@v2
       with:
@@ -98,7 +98,7 @@ jobs:
 
     steps:
     - name: Checkout
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Use Node ${{ matrix.node }}
       uses: actions/setup-node@v1
       with:

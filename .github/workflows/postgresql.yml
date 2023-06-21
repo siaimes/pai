@@ -3,32 +3,71 @@ name: Publish postgresql Docker Image
 on:
   release:
     types: [published]
+  push:
+    branches:
+      - "**"
+  pull_request:
+    branches:
+      - "**"
 
 jobs:
   push_to_registry:
     name: Push Docker Image to Docker Hub
     runs-on: ubuntu-latest
     steps:
+
       - name: Check out the repo
-        uses: actions/checkout@v2
-      - name: Set env
-        run: echo "RELEASE_VERSION=${GITHUB_REF#refs/*/}" >> $GITHUB_ENV
+        uses: actions/checkout@v3
+
       - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+        if: github.event_name != 'pull_request'
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.DOCKERHUB_USERNAME }}
           password: ${{ secrets.DOCKERHUB_PASSWORD }}
+
+      - name: Docker meta-postgresql
+        id: meta-postgresql
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login || secrets.DOCKERHUB_USERNAME }}/postgresql
+          flavor: |
+            latest=auto
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=tag
+            type=ref,event=branch
+            type=ref,event=pr
       - name: Push postgresql to Docker Hub
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: ./src/postgresql
           file: ./src/postgresql/build/postgresql.k8s.dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/postgresql:${{ env.RELEASE_VERSION }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-postgresql.outputs.tags }}
+          labels: ${{ steps.meta-postgresql.outputs.labels }}
+
+      - name: Docker meta-postgresql-init-client
+        id: meta-postgresql-init-client
+        uses: docker/metadata-action@v4
+        with:
+          # list of Docker images to use as base name for tags
+          images: |
+            ${{ github.event_name == 'pull_request' && github.event.pull_request.user.login || secrets.DOCKERHUB_USERNAME }}/postgresql-init-client
+          flavor: |
+            latest=auto
+          # generate Docker tags based on the following events/attributes
+          tags: |
+            type=ref,event=tag
+            type=ref,event=branch
+            type=ref,event=pr
       - name: Push postgresql-init-client to Docker Hub
-        uses: docker/build-push-action@v2
+        uses: docker/build-push-action@v4
         with:
           context: ./src/postgresql
           file: ./src/postgresql/build/postgresql-init-client.k8s.dockerfile
-          push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/postgresql-init-client:${{ env.RELEASE_VERSION }}
+          push: ${{ github.event_name != 'pull_request' }}
+          tags: ${{ steps.meta-postgresql-init-client.outputs.tags }}
+          labels: ${{ steps.meta-postgresql-init-client.outputs.labels }}
